@@ -1,0 +1,384 @@
+\documentclass[10pt,a4paper]{article}
+\author{Tim Schmidt}
+\title{Algorithms for graph visualization}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{xspace}
+\usepackage[english]{babel}
+\usepackage[autostyle]{csquotes}
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage{siunitx}
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows}
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+% activate={true,nocompatibility} - activate protrusion and expansion
+% final - enable microtype; use "draft" to disable
+% tracking=true, kerning=true, spacing=true - activate these techniques
+% factor=1100 - add 10% to the protrusion amount (default is 1000)
+% stretch=10, shrink=10 - reduce stretchability/shrinkability (default is 20/20)
+\microtypecontext{spacing=nonfrench}
+
+\setlength{\parindent}{0cm}
+
+\def\realnumbers{\ensuremath{\mathbb{R}}\xspace}
+\def\naturalnumbers{\ensuremath{\mathbb{N}}\xspace}
+\def\complexnumbers{\ensuremath{\mathbb{C}}\xspace}
+\newcommand{\SO}{\ensuremath{\mathit{SO}(3)}\xspace}
+\newcommand{\SE}{\ensuremath{\mathit{SE}(3)}\xspace}
+\newcommand{\myMatrix}[1]{\ensuremath{\begin{pmatrix}#1\end{pmatrix}}}
+\newcommand{\myVector}[1]{\ensuremath{\begin{pmatrix}#1\end{pmatrix}}}
+\newcommand{\quaternionen}{\ensuremath{\mathbb{H}}\xspace}
+
+\begin{document}
+	\pagenumbering{Roman}
+	{\let\newpage\relax\maketitle}
+	\tableofcontents
+	\newpage
+	\pagenumbering{arabic}
+	\setcounter{page}{1}
+
+\section{Canonical Ordering}
+Every planar graph has a planar straigh-line drawing.
+To construct such a drawing, we can use the \textit{Shift
+algorithm} (aka \textit{De Fraysseix Pach Pollack algorithm}) or use a
+\textit{Schnyder Realizer} to obtain a \textit{Barycentric Representation}.
+No matter which approach we choose, we first need a \textbf{Canonical Ordering}
+of the graph.
+
+Assume that we have a \textbf{triangulated planar embedded graph} (embedding
+of a maximal planar graph) $G = (V,E)$ with at least 3 vertices ($n \geq 3$).
+On that, a \textbf{canonical ordering} is guaranteed to exist.
+
+A canonical ordering is an ordering of vertices $\pi = (v_1, v_2, \cdots, v_n)$
+for which the following conditions hold:
+
+\begin{enumerate}
+    \item We can remove an arbitrary amount of vertices in reverse order (=
+        take off the last x vertices) and still end up with a 2-connected
+        triangulated graph, as long as we still have at least 3 vertices left.
+        More formally:
+
+        For all $k \in \mathbb{N}$ with $3 \leq k \leq n$ the set $\{v_1,
+        \cdots, v_k\}$ induces the 2-connected triangulated graph $G_k$.
+
+    \item The first two vertices $v_1, v_2$ belong to the outer face of $G_k$.
+
+    \item When adding vertices in ascending order, i.e. when iterating from
+        $G_3$ to $G_n$, the new vertex $v_{k+1}$ always lies on the outer face
+        of $G_k$ and all its neighbours lie on the outer boundary of $G_k$.
+
+        This means that you can add the vertices in ascending order without
+        creating crossings.
+\end{enumerate}
+
+\subsection{Computing Canonical Ordering}
+In order to compute the canonical ordering, we use the following steps:
+
+\begin{itemize}
+    \item $out(v)$ means that \enquote{v lies on the outer boundary}.
+        Intialized to false.
+    \item $mark(v)$ means that \enquote{v has been checked}.
+        Intialized to false.
+    \item $chords(v)$ counts the \enquote{chords that v is attached to}.
+        Intialized to 0.
+\end{itemize}
+
+
+\begin{enumerate}
+    \item The first two vertices $v_1, v_2$ and the last vertex $v_n$ is set
+        to be on the outer boundary, so $out(v_1), out(v_2), out(v_n) = true$.
+    \item We iterate from n down to 3.
+        Start with $k = n$.
+    \item Choose an umarked vertex $v$ on the boundary that is not connected to
+        a chord ($mark(v) = false, out(v) = true, chords(v) = 0$).
+    \item Mark $v$ ($mark(v) = true$) and set v as the $k$-th element of the
+        canonical order ($v_k = v$).
+    \item Remove $v$ and list the vertices of the new boundary (= of the new
+        graph $G_{k-1}$) as $w_1, \cdots, w_t$ with $w_1 = v_1, w_t = v_2$.
+
+        A subsequence of this new ordering are the unmarked neighbours of
+        $v_k$.
+        We will name them $w_p, \cdots, w_q$.
+    \item The \textbf{inner} neighbours (excluding $w_p, w_q$) have just been
+        exposed to the outer face and are now on the boundary.
+        Set $out(w_i) = true$ for $p < i < q$.
+    \item Update the amount of chords for all $w_i$ and its neighbours.
+    \item $k++$. Go back to step 3 unless $k<3$.
+\end{enumerate}
+
+\textbf{Runtime}: $\mathcal{O}(n)$
+
+\section{Shift Algorithm}
+
+We start with the following positions:
+
+\begin{itemize}
+    \item $v_1$ on $(0,0)$
+    \item $v_2$ on $(2,0)$
+    \item $v_3$ on $(1,1)$
+\end{itemize}
+
+Now we add the vertices in ascending canonical order as follows:
+
+\begin{enumerate}
+    \item $k = 4$
+    \item Identify the already added neighbours of $v_k$.
+    \item The first neighbour and all vertices left of it are not moved.
+    \item The last neighbour and all vertices right of it are moved by $+2$ in
+        x-direction.
+    \item The inner neighbours are moved by $+1$ in x-direction.
+    \item Draw a north-east (north-west) guideline from the first (last) neighbour
+        with $slope = 1$ ($slope = -1$).
+    \item Add $v_k$ on the intersection of these lines.
+        Remove the guidelines afterwards.
+    \item $k++$. Go back to step 2 unless $k>n$.
+\end{enumerate}
+
+When finished, the positions of $v_1, v_2, v_n$ are always the same:
+\begin{itemize}
+    \item $v_1$ on $(0,0)$
+    \item $v_2$ on $(2n-4,0)$
+    \item $v_n$ on $(n-2,n-2)$
+\end{itemize}
+
+\textbf{Invariants}:
+For $G_{k-1}$:
+\begin{itemize}
+    \item $v_1$ is on $(0,0)$ and $v_2$ is on $(2k-6,0)$
+    \item The boundary (without edge $(v_1, v_2)$) is x-monotone (e.g. always
+        goes to the right).
+    \item Each edge on the boundary (without edge $(v_1, v_2)$) has $slope =
+        \pm1$.
+\end{itemize}
+
+\textbf{Area}: $(2n-4) * (n-2)$
+
+\section{Barycentric Representation}
+A \textbf{Barycentric Representation} of a graph $G = (V,E)$ is an assignment
+of barycentric coordinates to each of G's vertices.
+It is an \textit{injective} function $v \mapsto (v_a, v_b, v_c)$ such that
+
+\begin{itemize}
+    \item The sum of the coordinates is always 1:\\
+        $v_a + v_b + v_c = 1$
+    \item If we have an edge $(x, y)$ and a third vertex $z$, then this vertex
+        is always closer to $A$, $B$, or $C$ than both $x$ or $y$, formally:\\
+        $\exists k \in \{a, b, c\}$ with $x_k < z_k$ and $y_k < z_k$.
+\end{itemize}
+
+Drawing $G$ in the triangle $\Delta A B C$ with its barycentric representation
+will \textbf{always} result in a planar drawing.
+
+\subsection{Schnyder Labelling}
+Before we get to the \textit{Schnyder Realizer} with which we can create a
+barycentric representation, we have to create a \textit{Schnyder Labelling}.
+
+A Schnyder Labelling of a planar triangulated graph $G$ is a labelling of all
+internal angles (angles not on the outer face) with label 1, 2, and 3 such
+that:
+\begin{itemize}
+    \item Each internal face contains all three labels in counterclockwise
+        order.
+        (Remember that all internal faces in a triangulated graph are
+        triangles.)
+    \item Each vertex is surrounded by angles of all three kinds, appearing in
+        counterclockwise order.
+        Note that a vertex might have more than three labels attached to it.
+        If that is the case, duplicate labels appear next to each other.
+        So at each vertex, you have a \textit{nonempty} interval of 1's, then
+        2's, then 3's.
+\end{itemize}
+
+\textbf{Every triangulated plane graph} has a Schnyder labelling!
+
+More important properties:
+\begin{itemize}
+    \item The labels at each of the triangle points $A, B, C$ are the same,
+        e.g. all labels at $A$ are 1.
+    \item Each edge induces 4 labels (two angles per vertex).
+        At one end of each edge, the labels are the same.
+        You can characterize an edge by the name of the duplicate label and the
+        end on which those labels appear.
+\end{itemize}
+
+If we say that each edge points in the direction of the duplicate label, we
+can define a\ldots
+
+\subsection{Schnyder Realizer}
+
+A \textbf{Schnyder Realizer} or \textbf{Schnyder Forest} partitions the edges
+of a triangulated planar graph $G$ into three sets $T_1, T_2, T_3$.
+Edges pointing towards a duplicate \enquote{1} label belong to $T_1$ and so on.
+
+This partitioning also has to satisfy the following constraints for each inner
+vertex $v$:
+\begin{itemize}
+    \item $v$ has exactly one outgoing edge in each of $T_1, T_2, T_3$.
+    \item The edges appear in six intervals, similar to the intervals in the
+        Schnyder labelling: Outgoing in $T_1, T_2, T_3$ and incoming in $T_1,
+        T_2, T_3$.
+
+        The outgoing interval is always opposite of the incoming interval of
+        the same label.
+        The incoming intervals appear in counterclockwise order.
+
+        So one could say the order of intervals is:\\
+        $T_1$ incoming, $T_3$ outgoing, $T_2$ incoming, $T_1$ outgoing, $T_3$
+        incoming, $T_2$ outgoing.
+\end{itemize}
+
+\textbf{Every triangulated plane graph} has a Schnyder realizer!
+
+\subsection{From Schnyder Realizer to Barycentric Representation}
+
+Let's assign colours to the edge sets of the Schnyder Realizer:\\
+\textcolor{red}{$T_1$} is red, \textcolor{blue}{$T_2$} is blue,
+\textcolor{green}{$T_3$} is green.
+
+From this we can deduce a few interesting properties:
+\begin{itemize}
+    \item $A, B, C$ are the only sinks for the red / blue / green paths.
+    \item From each vertex, there is a red / blue / green path to $A / B / C$.
+        Let's call it $P_a(v) / P_b(v) / P_c(v)$.
+    \item No monochromatic cycle exists.
+    \item Each monochromatic subgraph is a tree!
+\end{itemize}
+
+The Paths $P_a(v) / P_b(v) / P_c(v)$ cross only at $v$ and thus divide the
+graph into three face sets:
+
+The set of faces $R_a(v)$ lies on the opposite side of $A$, bound by $P_b(v),
+P_c(v)$ and $(B, C)$.
+$R_b(v)$ and $R_c(v)$ are defined similarly.
+
+If another vertex $u$ lies in one of the sets of faces induced by $v$, called
+$R_i(v)$, $u$'s set of faces on that side ($R_i(u)$) is a strict subset of
+$R_i(v)$.
+
+The \textbf{barycentric coordinates} of a vertex $v$ are
+$$ f: v \mapsto (v_a, v_b, v_c) = \frac{1}{2n-5} (|R_a(v)|,|R_b(v)|,|R_c(v)|) $$
+
+The function $f$ is the \textbf{barycentric representation} of $G$.
+
+\textit{Note}: $2n-5$ is the total number of faces in $G$.
+Normalizing by that guarantees that the sum of the coordinates is always 1.
+
+\textbf{Area}: $(2n-5)^2$
+
+\subsection{Weak Barycentric Coordinates}
+
+We can make the graph even smaller by using \textbf{weak barycentric
+coordinates}:
+$$ f: v \mapsto (v_a, v_b, v_c) = \frac{1}{n-1} (|n_1(v)|,|n_2(v)|,|n_3(v)|) $$
+$$ n_i(v) = |\text{vertices in }R_i(v)| - |P_{i-1}(v)| $$
+$$ A = (n-1, 0), B = (0, n-1), C = (0,0) $$
+
+The second condition differs a bit from standard barycentric coordinates:
+
+\begin{itemize}
+    \item For each edge $(u, v)$ and third vertex ($z$):
+        $$ \exists k \in \{a, b, c\} \text{ so that }
+        (u_k, u_{k+1}) <_{lex} (z_k, z_{k+1}) \text{ and }
+        (v_k, v_{k+1}) <_{lex} (z_k, z_{k+1}) $$
+\end{itemize}
+
+\textbf{Area}: $(n-2)^2$
+
+\section{Orthogonal Drawing}
+
+\subsection{\textit{st}-ordering}
+An \textbf{\textit{st}-ordering} is an ordering of vertices $\{v_1, v_2, \dots,
+v_n\}$ such that all inner vertices (all but $v_1, v_n$) are adjacent to a
+preceding and a following vertex.
+More formally: For each $j, 2 \leq j \leq n-1$ the vertex $v_j$ hat at least
+one neighbour $v_i$ with $i < j$ and at least one neighbour $v_k$ with $j < k$.
+
+The first node $v_1$, also called $s$, is the only source in the graph.
+The last node $v_n$, also called $t$, is the only sink.
+
+\textbf{Every biconnected graph} has an \textit{st}-ordering.
+
+\subsection{Biedl \& Kant Algorithm}
+The Biedl \& Kant algorithm assigns a drawing pattern to each vertex, based on
+its indegree (see slides). The first vertex is drawn differently.
+
+Based on the pattern, vertices may create a number of columns:
+\begin{itemize}
+    \item First vertex: At most 3
+    \item Vertex with indegree 1: At most 2
+    \item Vertex with indegree 2: At most 1
+    \item Vertex with indegree 3 or 4: No new columns
+\end{itemize}
+
+\textbf{Area}: Width $m - n + 1$, height at most $n+1$
+
+\textbf{Amount of bends}: At most $2m - 2n + 4$
+
+\textbf{Runtime}: $\mathcal{O}(n)$ if an \textit{st}-ordering is provided
+
+\textbf{Bends per edge}: At most 2 (except for maybe one edge with 3 bends)
+
+\textbf{If $G$ is plane}, the orthogonal drawing is planar.
+
+\section{Constructing an \textit{st}-ordering}
+If we have directed acyclic graph $G$ with one source and one sink, then we
+call it an \textbf{\textit{st}-digraph}.
+
+On this \textit{st}-digraph, we construct a \textbf{topological ordering}
+$v_1, v_2, \dots, v_n$ such that for every edge, the parent vertex comes before
+the child vertex.
+Formally: $\forall (v_i, v_j) \in E: i < j$
+
+\subsection{Orienting edges}
+If we start with an undirected biconnected graph $G$, we first have to orient
+the edges of $G$.
+For that, we use \textbf{ear decomposition}.
+
+An ear decomposition is a partition of the edges of $E$ into an ordered
+collection of disjoint paths $P_0, \dots, P_r$ with the following properties:
+
+\begin{itemize}
+    \item $P_0$ is just a single edge.
+    \item $P_0 \cup P_1$ is a simple cycle.
+    \item All paths $P_i$ meet the previous paths in their end-vertices, i.e.
+        the endpoints also belong to $P_1 \cup \dots \cup P_{i-1}$
+    \item No internal vertices of a path belong to previous paths.
+\end{itemize}
+
+\textbf{Every biconnected graph} $G$ with an edge $(s, t)$ has an open ear
+decomposition with $P_0 = (s, t)$.
+
+With this ear decomposition we can now create an \textit{st}-orientation:
+\begin{enumerate}
+    \item Assign a direction to $P_0$.
+        $P_0$ now belongs to the set of directed ears.
+    \item If two vertices are in the set of directed ears that are also
+        connected by an undirected ear, i.e. are the end-points of another ear,
+        apply the same direction to that other ear (in a way that does not
+        produce cycles).
+    \item Repeat step 2 until all ears are oriented.
+\end{enumerate}
+
+The resulting graph $G'$ is the \textbf{\textit{st}-orientation} of $G$.
+
+\subsection{Topological ordering}
+With this \textit{st}-orientation, we can create a topological ordering as
+follows:
+\begin{enumerate}
+    \item For $P_0$ and $P_1 = \{u_1, \dots, u_p\}$, the end-vertices are the
+        source $s$ and sink $t$.
+        The sequence $L = \{u_1, \dots, u_p\}$ is an \textit{st}-ordering of
+        $G_1$.
+    \item From here on, take the next ear $P_{i+1} = \{v_1, \dots, v_p\}$ and
+        insert it into $L$ between $v_1$ and $v_p$.
+        Note that $v_1$ and $v_p$ are the end-vertices of $P_{i+1}$ but are
+        also contained in the previous ears so they're already in $L$.
+    \item Repeat step 2 until all vertices are added.
+\end{enumerate}
+
+\textbf{Runtime}: $\mathcal{O}(E)$
+
+\end{document}
