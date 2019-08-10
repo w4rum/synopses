@@ -1,0 +1,114 @@
+\documentclass[10pt,a4paper]{article}
+\author{Tim Schmidt}
+\title{Algorithmen für planare Graphen}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{xspace}
+\usepackage[german]{babel}
+\usepackage[autostyle]{csquotes}
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage{siunitx}
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows}
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+% activate={true,nocompatibility} - activate protrusion and expansion
+% final - enable microtype; use "draft" to disable
+% tracking=true, kerning=true, spacing=true - activate these techniques
+% factor=1100 - add 10% to the protrusion amount (default is 1000)
+% stretch=10, shrink=10 - reduce stretchability/shrinkability (default is 20/20)
+\microtypecontext{spacing=nonfrench}
+
+\setlength{\parindent}{0cm}
+
+\def\realnumbers{\ensuremath{\mathbb{R}}\xspace}
+\def\naturalnumbers{\ensuremath{\mathbb{N}}\xspace}
+\def\complexnumbers{\ensuremath{\mathbb{C}}\xspace}
+\newcommand{\SO}{\ensuremath{\mathit{SO}(3)}\xspace}
+\newcommand{\SE}{\ensuremath{\mathit{SE}(3)}\xspace}
+\newcommand{\myMatrix}[1]{\ensuremath{\begin{pmatrix}#1\end{pmatrix}}}
+\newcommand{\myVector}[1]{\ensuremath{\begin{pmatrix}#1\end{pmatrix}}}
+\newcommand{\quaternionen}{\ensuremath{\mathbb{H}}\xspace}
+
+\begin{document}
+	\pagenumbering{Roman}
+	{\let\newpage\relax\maketitle}
+	\tableofcontents
+	\newpage
+	\pagenumbering{arabic}
+	\setcounter{page}{1}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Grundlagen}
+% Anzahl Knoten / Kanten / Facetten
+% Kanten bei keinen Dreiecken
+% Satz von Euler
+% Knoten mit Grad <= 5
+% Färbbarkeit
+\subsection{Triangulierung}
+\subsection{Dualgraphen}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Satz von Kuratowski}
+% Aussage
+\subsection{$K_5$ und $K_{3,3}$}
+\subsection{Minor, Topologischer Minor, Unterteilung}
+\subsection{Kuratowski vs. Wagner}
+\subsection{Beweis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Färbung}
+\subsection{4-Färbbarkeit}
+\subsection{5-Listenfärbbarkeit}
+\subsection{4-Listenfärbbarkeit}
+
+% Verbindung Maximalgrad <-> Chromatische Zahl
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Kleinkram}
+\subsection{Außenplanare Graphen}
+\subsection{Petersengraph}
+\subsection{Adjazenztest in $\mathcal{O}(1)$}
+\subsection{Core-Zerlegung}
+\subsection{Entartetheit}
+\subsection{Dreiecke zählen}
+\subsection{MST}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Planar-Separator-Theorem}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Planaritätstest mit PQ-Baum}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Triangulierung}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Matchings}
+\subsection{Erhöhende Wege}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Mixed-Max-Cut und Via-Minimierung}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{\textit{st}-planare Graphen}
+\subsection{Max-Flow}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Menger}
+
+
+\end{document}
