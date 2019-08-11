@@ -12,6 +12,7 @@
 \usepackage[a4paper, total={6in, 8in}]{geometry}
 \usepackage{siunitx}
 \usepackage{tikz}
+\usepackage{subfig}
 \usetikzlibrary{shapes, arrows}
 \usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
 % activate={true,nocompatibility} - activate protrusion and expansion
@@ -22,15 +23,47 @@
 \microtypecontext{spacing=nonfrench}
 
 \setlength{\parindent}{0cm}
+\setlength{\parskip}{0.2cm}
 
-\def\realnumbers{\ensuremath{\mathbb{R}}\xspace}
-\def\naturalnumbers{\ensuremath{\mathbb{N}}\xspace}
-\def\complexnumbers{\ensuremath{\mathbb{C}}\xspace}
-\newcommand{\SO}{\ensuremath{\mathit{SO}(3)}\xspace}
-\newcommand{\SE}{\ensuremath{\mathit{SE}(3)}\xspace}
-\newcommand{\myMatrix}[1]{\ensuremath{\begin{pmatrix}#1\end{pmatrix}}}
-\newcommand{\myVector}[1]{\ensuremath{\begin{pmatrix}#1\end{pmatrix}}}
-\newcommand{\quaternionen}{\ensuremath{\mathbb{H}}\xspace}
+\graphicspath{{images/}}
+
+% maxwidth parameter for \includegraphics
+% see https://tex.stackexchange.com/a/86355
+\makeatletter
+\def\maxwidth#1{\ifdim\Gin@nat@width>#1 #1\else\Gin@nat@width\fi}
+\makeatother
+
+\newcommand{\imageFigure}[4]{%
+    \begin{figure}[h]%
+        \centering%
+        {%
+            \setlength{\fboxsep}{1pt}%
+            \setlength{\fboxrule}{1pt}%
+            %\fbox{
+            \includegraphics[width=\maxwidth{#3\textwidth}]{#2}%}%
+        }%
+        \caption{#1}%
+        \label{fig:#4}%
+    \end{figure}%
+}
+
+\newcommand{\imageFigureMult}[6]{%
+    \imageFigureMultS{#1}{#2}{#3}{#4}{#5}{#6}{0.45}%
+}
+
+\newcommand{\imageFigureMultS}[7]{%
+    \begin{figure}[h]%
+        \centering
+        \subfloat[#1]{{\includegraphics[width=\maxwidth{#7\textwidth}]{#2} }}%
+        \qquad
+        \subfloat[#3]{{\includegraphics[width=\maxwidth{#7\textwidth}]{#4} }}%
+        \caption{#5}%
+        \label{fig:#6}%
+    \end{figure}
+}
+
+\newcommand{\Kf}{$K_5$}
+\newcommand{\Kdd}{$K_{3,3}$}
 
 \begin{document}
 	\pagenumbering{Roman}
@@ -43,22 +76,363 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Grundlagen}
-% Anzahl Knoten / Kanten / Facetten
+Planare Graphen sind Graphen, die sich so in die Ebene einbetten lassen, dass
+sich keine Kanten kreuzen.
+Eine Einbettung ist dabei eine Zuweisung von Knoten auf Punkte und Kanten auf
+Kurven zwischen den inzidenten Knoten im 2D-Raum.
+
+Es gibt Graphen, die nicht planar sind.
+Darunter sind der vollständige Graph mit fünf Knoten \Kf und der vollständig
+bipartite Graph mit sechs Knoten \Kdd:
+
+\imageFigureMult{\Kf}{k5.png}{\Kdd}{k33.png}{Nicht-planare Graphen}{nonplanar}
+
+\subsection{Allgemeine Aussagen über Knoten- und Kantenmenge}
+Über planare Graphen lassen sich folgende allgemeine Aussagen machen:
+\begin{itemize}
+    \item In einem \textit{zusammenhängenden} planaren Graph erfüllt die Anzahl
+        der Knoten $n$, Kanten $m$ und Facetten $f$ den Satz von Euler:
+        $$n-m+f=2$$
+        Dies lässt sich relativ leicht durch Induktion zeigen:
+
+        In einem einfach zusammenhängenden Pfad gibt es $n$ Knoten, $n-1$
+        Kanten und genau eine Facette, nämlich die äußere, also gilt
+        $$n-(n-1)+1=2$$
+
+        Wird nun ein Knoten hinzugefügt und mit einer Kante an den Graphen
+        angehangen, erhöhen sich $n$ und $m$ jeweils um eins.
+        Dabei verändert sich die Summe nicht.
+        $$(n+1)-(n-1+1)+1=2$$
+
+        Wird eine Kante zwischen zwei bestehenden Knoten eingefügt, wird damit
+        eine Facette durchschnitten.
+        Somit erhöht sich $m$ und $f$ um eins und die Summe bleibt weiterhin
+        gleich.
+        $$n-(n-1+1)+(1+1)=2$$
+
+        \imageFigureMult{$n=4, m=3, f=1$}{line.png}
+            {$n=4, m=4, f=2$}{line2.png}
+            {Bzgl. Satz von Euler}{eulergraphs}
+    \item Ein planarer, \textit{einfacher} Graph mit mindestens 3 Knoten hat
+        höchstens $3n-6$ Kanten.
+        Wenn er keine Dreiecke hat, sogar nur höchstens $2n-4$ Kanten.
+
+        Dies ist extrem wichtig für die Laufzeiten einiger Algorithmen, da für
+        planare Graphen somit $m \in \mathcal{O}(n)$ gilt, während für
+        allgemeine Graphen nur $m \in \mathcal{O}(n^2)$ gilt.
+
+        Das lässt sich aus dem Satz von Euler schließen:
+
+        In einem planaren Graph mit maximaler Anzahl von Kanten ist jede
+        Facette ein Dreieck (Beweis später).
+        Demnach grenzt jede Facette an drei Kanten an.
+        Da jede Kante gleichzeitig an zwei Facetten angrenzt gilt:
+        $$3f=2m$$
+        Eingesetzt in den Satz von Euler:
+        \begin{align*}
+            n-m+\frac{2}{3}m&=2\\
+            n-\frac{1}{3}m&=2\\
+            m&=3n-6
+        \end{align*}
+
+        Dies gilt für maximale planare Graphen.
+        Im Allgemeinen also
+        $$m \leq 3n-6$$
+
+        In Graphen ohne Dreiecke ist der Beweis analog mit $4f\leq2m$
+
+
+    \item Jeder planare Graph enthält einen Knoten mit Grad $\leq 5$
+
+        Sei $n_i$ die Anzahl Knoten mit Grad $i$ und $d_{max}$ der Maximalgrad.
+        Dann gilt
+        $$n=\sum_{i=0}^{d_{max}}{n_i}$$
+        und
+        $$2m=\sum_{i=0}^{d_{max}}{i*n_i}$$
+        Eingesetzt in die Kantenbegrenzung:
+        \begin{align*}
+            m &\leq 3n-6\\
+            2m &\leq 6n-12\\
+            2m+12 &\leq 6n\\
+            \sum_{i=0}^{d_{max}}{i*n_i} + 12 &\leq 6*\sum_{i=0}^{d_{max}}{n_i}\\
+        \end{align*}
+        \begin{align*}
+            0*n_0+1*n_1+2*n_2+3*n_3+&4*n_4+5*n_5+6*n_6+7*n_7+\cdots + 12 \leq\\
+            6*n_0+6*n_1+6*n_2+6*n_3+&6*n_4+6*n_5+6*n_6+6*n_7\cdots
+        \end{align*}
+        Subtrahiert man $n_0$ bis $n_6$ nun aus der oberen Zeile raus erhält man
+        $$1*n_7+2*n_8+\cdots + 12 ~~~\leq~~~ \underbrace{6*n_0+5*n_1+4*n_2+3*n_3+2*n_4+1*n_5}_{\geq 1\text{, also gibt es mind. einen Knoten in }n_0\text{ bis } n_5}\\$$
+        %%
+\end{itemize}
 % Kanten bei keinen Dreiecken
 % Satz von Euler
 % Knoten mit Grad <= 5
 % Färbbarkeit
 \subsection{Triangulierung}
+Ein \textit{triangulierter} planarer Graph ist ein Graph, in dem alle Facetten
+Dreiecke sind.
+Dies ist gleichzeitig ein \textit{maximal planarer} Graph, d.h. es kann keine
+weitere Kante hinzugefügt werden, ohne die Planarität zu zerstören.
+\begin{itemize}
+    \item[\enquote{$\Longrightarrow$}]
+        \begin{itemize}
+            \item Angenommen Graph ist maximal planar aber nicht trianguliert
+            \item Graph nicht trianguliert $\implies$ Es gibt Facette $f$, die
+                kein Dreiecke ist
+            \item Auf Facette $f$ gibt es Knoten $u, v$, die nicht verbunden
+                sind
+            \item Kante $\{u, v\}$ kann hinzugefügt werden
+            \item Graph ist nicht maximal planar. Widerspruch.
+        \end{itemize}
+    \item[\enquote{$\Longleftarrow$}]
+        \begin{itemize}
+            \item Angenommen Graph ist trianguliert aber nicht maximal planar
+            \item Es kann eine Kante eingefügt werden, die keine Kreuzung
+                verursacht.
+            \item Diese Kante muss also durch eine einzige Facette f verlaufen.
+            \item Da f ein Dreieck ist, sind alle Knoten in f aber schon
+                verbunden. Widerspruch.
+        \end{itemize}
+\end{itemize}
+
 \subsection{Dualgraphen}
+Zu jedem planaren, eingebetteten Graph $G$ gibt es einen \textit{Dualgraph}
+$G^*$.
+Dieser wird erzeugt, indem jede Facette in $G$ einen Knoten in $G^*$ bekommt
+und für jede Kante in $G$ die beiden anliegenden Facetten in $G^*$ verbunden
+werden.
+
+\imageFigure{Dualgraph}{dual.png}{.5}{dual}
+
+\textit{Bemerkungen}:
+\begin{itemize}
+    \item Der Dualgraph muss nicht einfach sein.
+        Es treten Multikanten zwischen Dualknoten auf, wenn zwei Facetten in
+        $G$ durch mehr als eine Kante verbunden sind.
+        Dies ist in triangulierten Graphen offensichtlich nicht möglich.
+
+        Außerdem können Schleifen entstehen, wenn beide Seiten einer Kante in
+        $G$ zur gleichen Facette gehören.
+        Solche Kanten werden auch \enquote{Brücken} genannt und verbinden zwei
+        sonst unzusammenhängende Teilgraphen.
+    \item Einige Graphen sind isometrisch zu ihrem Dualgraphen, d.h. man kann
+        ihre Dualgraphen so einbetten, dass sie dem Ausgangsgraphen gleichen.
+        Solche Graphen nennt man \textit{selbstdual}.
+    \item Dualgraphen sind immer abhängig von einer konkreten Einbettung des
+        Ausgangsgraphen.
+        Ein Graph kann abhängig von der Einbettung verschiedene Dualgraphen
+        haben.
+\end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Satz von Kuratowski}
+Wie bereits oben vorgestellt gibt es mindestens zwei Graphen, die nicht planar
+sind:
+Der \Kf~und der \Kdd.
+
+Offensichtlich sind auch all die Graphen nicht-planar, die den \Kf~oder den
+\Kdd~als Subgraph enthalten.
+Ebenso werden diese beiden Graphen nicht dadurch planar, indem wir einen Knoten
+mitten auf einer Kante einfügen.
+Ein so entstandener Graph nennt man auch eine \enquote{Unterteilung}.
+\imageFigure{Unterteilung von \Kf}{k5-unt.png}{.2}{k5-unt}
+
+Tatsächlich reichen diese zwei Graphen und das Verständnis von Unterteilungen,
+um die Menge der planaren Graphen vollständig zu charakterisieren.
 % Aussage
-\subsection{$K_5$ und $K_{3,3}$}
-\subsection{Minor, Topologischer Minor, Unterteilung}
-\subsection{Kuratowski vs. Wagner}
-\subsection{Beweis}
+\subsection{Kantenkontraktion}
+Um eine Unterteilung des \Kf oder \Kdd festzustellen, brauchen wir eine
+Technik, um Unterteilungen rückgängig machen zu können.
+Diese nennt sich Kantenkontraktion.
+
+Beim Kontrahieren einer Kante $\{u,v\}$ werden die beiden anliegenden Knoten $u$
+und $v$ zu einem Knoten $vu$ zusammengelegt und die Kante $\{u,v\}$ gelöscht.
+Die restlichen vorher an $u$ und $v$ anliegenden Kanten werden alle auf $vu$
+übertragen.
+Dadurch entstandene Multikanten werden gelöscht.
+
+\imageFigure{Kontraktion von $\{u,v\}$}{kontr.png}{.7}{kontr}
+
+Entfernt man aus Abbildung \ref{fig:k5-unt} den roten Knoten, indem man eine
+der beiden anliegenden Kanten kontrahiert, erhält man wieder genau den \Kf.
+
+Beachte das beim Rückgängigmachen von Unterteilungen immer einer der Knoten,
+der an der Kontraktion beteiligt ist, Grad 2 hat.
+
+\subsection{Minor, Topologischer Minor}
+Sei $G$ ein Graph.
+Wenn es möglich ist den Graphen $H$ per Kantenkontraktion aus einem Subgraphen
+von $G$ zu erhalten, dann ist $H$ ein \textit{Minor} von $G$.
+Ist dies sogar dann möglich, wenn man nur Kanten kontrahiert, an die ein Knoten
+mit Grad 2 anliegt, dann ist $H$ sogar ein \textit{topologischer Minor}.
+
+Da es erlaubt ist, nur einen Subgraphen von $G$ zu betrachten, darf man also
+wie folgt vorgehen:
+\begin{enumerate}
+    \item Entferne beliebig viele Knoten und die anliegenden Kanten aus $G$.
+    \item Kontrahiere beliebig viele Kanten in $G$ (beachte obige Beschränkung,
+        falls nach topologischen Minoren gesucht wird).
+    \item Falls dadurch \Kf~oder \Kdd~rauskommt ist $G$ nicht planar.
+\end{enumerate}
+
+\subsection{Satz von Kuratowski / Wagner}
+Nach dem \textbf{Satz von Kuratowski} sind \textit{genau} die Graphen planar,
+die weder \Kf~noch \Kdd~als topologischen Minor enthalten.
+
+Der \textbf{Satz von Wagner} hingegen besagt, dass \textit{genau} die Graphen
+planar sind, die weder \Kf~noch \Kdd~als Minor enthalten.
+Diese Minoren müssen nicht zwangsweise topologische Minoren sein.
+
+Folgende Anmerkungen:
+\begin{enumerate}
+    \item Die Menge der Minoren eines Graphen und die Menge der topologischen
+        Minoren eines Graphen sind \textit{nicht} identisch.
+    \item Trotzdem sind die Sätze von Kuratowski und Wagner äquivalent.
+\end{enumerate}
+
+Beispiel zu Punkt 1:\\
+Im Petersengraph in Abbildung \ref{fig:petersen} erhält man \Kf~als Minor,
+indem man alle roten Kanten kontrahiert.
+Der \Kf~enthält 5 Knoten mit Grad 4.
+Durch eine Unterteilung werden die Grade der ursprünglichen Knoten nicht
+verändert.
+Demnach müsste der Petersengraph auch 5 Knoten mit mindestens Grad 4 besitzen,
+um \Kf~als topologischen Minor zu enthalten.
+Dies ist nicht der Fall.
+
+Allerdings enthält der Petersengraph den \Kdd~als topologischen Minor.
+Die Sätze von Kuratowski und Wagner kommen hier also zum gleichen Ergebnis.
+
+\imageFigure{Petersengraph}{petersen.png}{.7}{petersen}
+
+
+\subsection{Beweis der Äquivalenz}
+Nun ein Beweis zum obigen Punkt 2.
+
+Wir zeigen zuerst, dass wenn \Kdd~als Minor vorkommt, er auch als topologischer
+Minor vorkommt, indem wir folgendes Lemma beweisen:
+
+\textbf{Lemma 1.} Wenn der gesuchte Graph $H$ Maximalgrad $\Delta \leq 3$
+besitzt und ein Minor von $G$ ist, dann ist er auch ein topologischer Minor von
+$G$.
+
+$H$ ein Minor von $G$ und sei $G'$ der Subgraph von $G$, von dem aus wir durch
+Kontraktionen auf $H$ kommen.
+Angenommen es soll die Kante $\{u,v\}$ kontrahiert werden.
+Da in dem Zielgraphen $H$ der Maximalgrad höchstens 3 hat, darf der
+resultierende Knoten $uv$ auch maximal Grad 3 besitzen.\footnote{Es gibt
+Kontraktionsfolgen, bei denen der Grad von Knoten nachträglich wieder abnimmt.
+Keine Ahnung, warum das hier ignoriert werden darf. Es wird im Skript nicht
+angesprochen.}
+
+Angenommen $v$ und $u$ haben keine gemeinsamen Nachbarn\footnote{Die
+Randfallbehandlung für den anderen Fall im Skript scheint keinen Sinn zu
+ergeben, falls der gemeinsame Nachbar Grad 3 hat.}, dann gilt
+$$ \delta(vu) = \delta(u) - 1 + \delta(v) - 1 $$
+
+Dies kann aber nur dann höchstens 3 sein, wenn entweder $v$ oder $u$ einen Grad
+von höchstens 2 hat.
+
+\imageFigureMultS{$uv$ hat danach Rang 3}{eq-contr.png}{$uv$ hat hier auch Rang 3}{eq-contr2.png}{Kontraktion der Kante $\{u, v\}$}{eq-contr}{.3}
+
+Da einer der Knoten also höchstens Grad 2 hat, darf diese Kontraktion auch
+unter topologischer Minorenfindung durchgeführt werden.
+
+$\implies$ Wenn \Kdd~Minor ist, ist er auch topologischer Minor.
+
+Nun zeigen wir noch, dass wenn \Kf~Minor ist, entweder \Kf~oder
+\Kdd~topologischer Minor ist.
+
+Sei \Kf~Minor von $G$ und $G'$ der minimale Subgraph, aus dem \Kf~nur durch
+Kontraktionen gewonnen wird.
+Dann gibt es eine Partition von $G'$ in fünf Knotenmengen $\{V_1, \cdots,
+V_5\}$.
+Diese sind paarweise miteinander über eine Kante verbunden.
+Da $G'$ minimal ist, gibt es keine Kreise innerhalb der Partitionen, weshalb
+sie für sich genommen Bäume sind.
+
+Wenn alle $V_i$ Unterteilungen von $K_{1,4}$ sind (wie $V_5$ in Abbildung
+\ref{fig:minor-to-top}), dann ist $G'$ eine Unterteilung von \Kf~und hat
+demnach \Kf~als topologischen Minor.
+
+Wenn eine Partition keine Unterteilung von $K_{1,4}$ ist, dann muss sie zwei
+Knoten mit Grad 3 haben und wir können wir in Abbildung \ref{fig:minor-to-top}b
+einen \Kdd-Minor bauen.
+Wie oben gezeigt ist dann \Kdd~auch ein topologischer Minor.
+
+$\implies$ Wenn \Kf~ein Minor ist, dann ist \Kf~oder \Kdd~ein topologischer
+Minor.
+
+\imageFigureMult{}{minor-to-top1.png}{}{minor-to-top2.png}{}{minor-to-top}
+
+Demnach sind also die Sätze von Kuratowski und Wagner äquivalent.
+
+\subsection{Beweis des Satzes von Wagner}
+Es ist einfacher den Satz von Wagner zu beweisen.
+Da dieser mit dem Satz von Kuratowski äquivalent ist müssen wir letzteren
+danach nicht mehr beweisen.
+
+Dass ein Graph nicht planar sein kann, wenn er einen nicht-planaren Graphen als
+Subgraphen oder Minor hat, ist offensichtlich.
+Es bleibt also nur die andere Richtung zu beweisen.
+
+Dazu definieren wir \textit{minorminimal nicht planare} Graphen.
+Das sind Graphen, die selbst nicht planar sind, aber dessen Minoren alle planar
+sind.
+
+Ein solcher Graph hat Minimalgrad 3, da Knoten mit Grad $\leq 2$ kontrahiert
+werden können, ohne die Planarität zu ändern, was zu einem nicht-planaren Minor
+führen würde.
+
+Offensichtlich ist auch, dass wenn ein Graph $G$ nicht planar ist aber nicht
+selbst minorminimal nicht planar ist, einen minorminimal nicht planaren Minor
+haben muss.
+Das ist leicht zu realisieren wenn man bedenkt, dass man jeden Graphen planar
+machen kann, wenn man nur genug Knoten entfernt oder Kanten kontrahiert.
+Macht man das so lange, bis jede weitere Entfernung bzw. Kontraktion zu einem
+planaren Graphen führen würde, hat man einen minorminimal nicht planaren
+Graphen erreicht.
+
+Im folgenden zeigen wir, dass \Kf~und \Kdd~die einzigen minorminimal nicht
+planaren Graphen sind.
+Daraus folgt dann direkt, dass entweder \Kf~oder \Kdd~enthalten sein muss,
+damit ein Graph nicht planar ist.
+
+Dieser Beweis ist ziemlich lang und wir brauchen dafür einiges an Werkzeug, das
+wir vorher abarbeiten werden.
+Den gesamten Beweis lang haben wir einen Graph $G$, der minorminimal nicht
+planar ist und einen Graph $G'$, der entsteht, wenn wir zwei beliebige
+\textit{benachbarte} Knoten $x$ und $y$ entfernen.
+
+\textbf{Lemma 3.} $G'$ ist ein einfacher Kreis.
+
+Um Lemma 3 zu beweisen brauchen wir zwei weitere Lemmata:
+
+\textbf{Lemma 5.} $G'$ enthält keinen Theta-Graph (siehe Abbildung
+\ref{fig:theta}).\\
+\textbf{Lemma 6.} $G'$ enthält höchstens einen Knoten mit Grad $\leq 1$.
+
+\imageFigure{Ein Theta-Graph ist eine beliebige Unterteilung des obigen
+Multigraphs}{theta.png}{.3}{theta}
+
+Beweis zu Lemma 5:\\
+Folgende Feststellungen sind wichtig:
+\begin{itemize}
+    \item Nur Bäume und Wälder haben genau eine Facette.
+        Bei Graphen mit mehreren Facetten bildet jeder Facettenrand einen
+        Kreis.
+    \item Sei $G$ planar und $C$ ein einfacher Kreis in $G$.
+        Wenn alle Knoten auf $C$ nur durch $C$ verbunden sind, also in $G-E(C)$
+        nicht verbunden sind, dann kann man $G$ so einbetten, dass $C$ die
+        äußere Facette begrenzt. Siehe Abbildung \ref{fig:c-outer}.
+    \item Der Rand einer Facette $f$, also alle an $f$ anliegenden Knoten und
+        Kanten, beinhaltet keinen Theta-Graph. Siehe Abbildung
+        \ref{fig:face-no-theta}.
+\end{itemize}
+
+\imageFigure{C begrenzt die äußere Facette}{c-outer.png}{.7}{c-outer}
+\imageFigure{Facettenränder beinhalten keinen Theta-Graphen}{face-no-theta.png}{.4}{face-no-theta}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
