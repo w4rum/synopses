@@ -416,7 +416,7 @@ Um Lemma 3 zu beweisen brauchen wir zwei weitere Lemmata:
 \imageFigure{Ein Theta-Graph ist eine beliebige Unterteilung des obigen
 Multigraphs}{theta.png}{.3}{theta}
 
-Beweis zu Lemma 5:\\
+\textbf{Beweis zu Lemma 5}:\\
 Folgende Feststellungen sind wichtig:
 \begin{itemize}
     \item Nur Bäume und Wälder haben genau eine Facette.
@@ -426,13 +426,243 @@ Folgende Feststellungen sind wichtig:
         Wenn alle Knoten auf $C$ nur durch $C$ verbunden sind, also in $G-E(C)$
         nicht verbunden sind, dann kann man $G$ so einbetten, dass $C$ die
         äußere Facette begrenzt. Siehe Abbildung \ref{fig:c-outer}.
-    \item Der Rand einer Facette $f$, also alle an $f$ anliegenden Knoten und
-        Kanten, beinhaltet keinen Theta-Graph. Siehe Abbildung
+    \item Der Rand $F$ einer Facette $f$, also alle an $f$ anliegenden Knoten
+        und Kanten, beinhaltet keinen Theta-Graph. Siehe Abbildung
         \ref{fig:face-no-theta}.
 \end{itemize}
 
-\imageFigure{C begrenzt die äußere Facette}{c-outer.png}{.7}{c-outer}
-\imageFigure{Facettenränder beinhalten keinen Theta-Graphen}{face-no-theta.png}{.4}{face-no-theta}
+\imageFigure{C begrenzt die äußere Facette}{c-outer.png}{.5}{c-outer}
+\imageFigure{Facettenränder beinhalten keinen Theta-Graphen}{face-no-theta.png}{.25}{face-no-theta}
+
+Da $G$ minorminimal nicht planar ist, muss $G'$ planar sein.
+Wir können also eine planare Einbettung $\Gamma_{G'}$ von $G'$ erstellen.
+Wir können sie sogar so konstruieren, dass alle zu $x$ oder $y$ benachbarten
+Knoten auf dem Rand der gleichen Facette $f$ liegen.
+
+Wenn wir jetzt den Facettenrand von $f$ betrachten, dann enthält dieser
+nachobiger Beaobachtung keinen Theta-Graphen.
+Angenommen $G'$ enthält einen Theta-Graph, dann ist $G'$ kein Baum oder Wald
+und der Facettenrand von $f$ beinhaltet einen Kreis $C$.
+
+Wir können die Einbettung $\Gamma_{G'}$ so konstruieren, dass auch die
+entfernten Knoten $x$ und $y$ im Inneren des Kreises $C$ liegen.\footnote{Das
+Skript benutzt hier die Notation $G/xy$, die nicht weiter erklärt wird.
+Möglicherweise ist $xy$, also die Kontraktion der Kante $\{x, y\}$ gemeint.}
+
+Da $G'$ einen Theta-Graphen enthält, muss sich midnestens noch eine weitere
+Kante $e$ außerhalb des Facettenrandes, also in $E(G') \backslash E(F)$,
+befinden.
+Damit liegt diese Kante auch außerhalb des Kreises $C$, also in $ext(C)$.
+
+Da $G$ minorminimal nicht planar und $ext(C)$ nicht leer ist, muss $G-ext(C)$
+planar sein.
+Da auch hier innerhalb von $C$ kein Theta-Graph besteht und demnach keine zwei
+Knoten auf $C$ durch eine weitere Kante innerhalb von $C$ verbunden sind, kann
+man wie in der zweiten obigen Beobachtung $G-ext(C)$ so einbetten, dass $C$
+die äußere Facette begrenzt.\footnote{Aber warum sollte $C$ auf $G-ext(C)$
+keinen Theta-Graphen enthalten? Diese Folgerung basierte auf $G'$. Hier ist $x$
+und $y$ ja noch enthalten, also sollte es doch auch möglich sein, dass $C$
+nicht Teil eines Facettenrandes ist.}
+
+Wenn wir jetzt die Einbettungen $\Gamma_{G'}$ und $\Gamma_{G-ext(C)}$ jeweils
+bei $C$ teilen und dann kombinieren, haben wir eine planare Einbettung von $G$.
+Widerspruch.
+
+$\implies$ $G'$ enthält keinen Theta-Graphen. (Lemma 5)
+
+\textbf{Beweis zu Lemma 6}:\\
+Zu beweisen ist, dass $G'$ höchstens einen Knoten mit Grad $\leq 1$ besitzt.
+
+Knoten von Grad 0 sind nicht möglich:
+$G$ hat Minimalgrad 3.
+Durch entfernen von $x$ und $y$ kann der Grad eines Knotens höchstens auf 1
+sinken, aber nicht auf 0.
+
+Angenommen es gäbe zwei Knoten $v$ und $u$ in $G'$ mit Grad 1.
+Dann müssten in $G$ beide adjazent zu $x$ und $y$ sein.
+Da die restlichen Knoten in $G$ auch Minimalgrad 3 haben, sind $v$ und $u$ noch
+über einen weiteren Weg $p$ verbunden.
+Dadurch enthält $G$ einen Theta-Graph in $\{x,y,u,v\} \cup p$.
+
+In diesem Fall darf es keine einzige Kante $\{i, j\}$ geben, die nicht an $\{x,
+y, u, v\}$ inzident ist.
+Ansonsten würde $G - i - j$ einen Theta-Graphen enthalten, was nach Lemma 5
+nicht möglich ist.
+
+\imageFigure{Es darf keine unabhängige Kante geben.}{xuvy1.png}{.3}{xuvy1}
+
+Damit gibt es nur noch weniger Möglichkeiten für das Aussehen von $G$:
+
+\imageFigure{
+    $u$ und $v$ sind verbunden.
+    Es gibt keine weiteren Knoten.
+}{xuvy2.png}{.3}{xuvy2}
+
+\imageFigure{
+    Es gibt den weiteren Knoten $z$.
+    $u$ und $v$ können nicht verbunden sein, da sie in $G$ höchstens Grad 3
+    haben dürfen.
+}{xuvy3.png}{.9}{xuvy3}
+
+\imageFigure{
+    Es gibt zwei weiteren Knoten $z$ und $z'$.
+    Der rechte Graph ist eine planere Einbettung des linken Graphs.
+    $u$ und $v$ können nicht verbunden sein, da sie in $G$ höchstens Grad 3
+    haben dürfen.
+    $z$ und $z'$ dürfen nicht verbunden sein, da sie eine unabhängige Kante
+    bilden würden.
+    Einen zusätzlichen Knoten $z''$ kann man nicht einfügen, da dieser
+    mindestens Grad 3 haben müsste.
+    Zu $v$ und $u$ dürfte er wegen des Maximalgrad von $v$ und $u$ nicht
+    verbunden sein und zu $z$ und $z'$ nicht, weil es eine unabhängige Kante
+    wäre.
+}{xuvy4.png}{.7}{xuvy4}
+
+Siehe Abbildungen \ref{fig:xuvy2}, \ref{fig:xuvy3} und \ref{fig:xuvy4}.
+Demnach wäre $G$ auf jeden Fall planar, was einen Widerspruch darstellen würde.
+
+$\implies$ $G'$ hat maximal einen Knoten mit Grad $\leq$ 1. (Lemma 6)
+
+\clearpage
+\textbf{Beweis zu Lemma 3}:\\
+Wir beweisen nun, dass $G'$ ein einfacher Kreis ist.
+Dazu nehmen wir an, dass $G'$ \textit{kein} einfacher Kreis ist und
+schlussfolgern daraus den Widerspruch, dass $G$ planar ist.
+
+Dazu definieren wir erst einmal die \textit{Blockzerlegung}.
+Zwei Kanten $e_1$ und $e_2$ sind äquivalent im Sinne der Blockzerlegung, wenn
+sie entweder gleich sind oder es einen einfachen Kreis gibt, der beide enthält.
+
+Die so induzierte Äquivalenzklassenzerlegung sieht man bspw. in Abbildung
+\ref{fig:block1}.
+Jede Kante ist dabei in genau einem Block und es gibt möglicherweise Knoten,
+die in mehreren Blöcken enthalten sind.
+Diese nennt man Seperatorknoten, hier rot dargestellt.
+
+\imageFigure{Blockzerlegung}{block1.png}{.7}{block1}
+
+Nach Lemma 5 enthält $G'$ keinen Theta-Graphen, weshalb alle Blöcke entweder
+einzelne Kanten oder einfache Kreise sind.
+Auch ist es nicht möglich, dass alle Blöcke in einem Kreis angeordnet sind,
+weil sie sonst zu einem Block zusammenfallen würden.
+Es muss also \textit{Endblöcke} geben.
+
+Nach Lemma 6 gibt es maximal einen Knoten mit Grad $\leq 1$.
+Da $G'$ nach Vorraussetzung kein einfacher Kreis ist und es nach Lemma 6 auch
+keine einzelne Kante ist, muss es mindestens zwei Blöcke und demnach auch zwei
+Endblöcke geben.
+Maximal einer dieser Endblöcke kann eine einfache Kante sein.
+Der anderen muss ein Kreis sein.
+
+\imageFigure{Blockzerlegung von $G'$}{block2.png}{.7}{block2}
+
+Diesen Kreis nennen wir jetzt $C$ und den Separatorknoten darauf $v$.
+Da alle anderen Knoten auf $C - v$ in $G'$ Grad 2 haben, aber $G$ Minimalgrad 3
+hat, müssen diese Knoten zu $x$ oder $y$ adjazent sein.
+Da ein Kreis mindestens Länge 3 hat, gibt es mindestens zwei andere Knoten auf
+$C - v$.
+Diese bilden wie in Abbildung \ref{fig:prisma1} zu sehen ist einen Theta-Graph
+mit $\{x, y, v\}$.
+
+\imageFigure{Alle anderen Knoten auf $C-v$ müssen zu $x$ oder $y$ adjazent
+sein.
+Alternative Kanten sind in Grau dargestellt.
+}{prisma1.png}{.5}{prisma1}
+
+Nach Lemma 5 gibt es keine unabhängige Kante, also keine Kante außerhalb von
+$\{x, y\} \cup C$, da ihr Entfernen aus $G$ ein $G'$ mit Theta-Graph
+produzieren würde.
+Isolierte Knoten sind nach Lemma 6 auch unmöglich, weshalb es höchstens einen
+weiteren Knoten $u$ geben kann.
+Sieh Abbildung \ref{fig:prisma2}.
+
+\imageFigure{Es gibt höchstens $u$ als zusätzlichen
+Knoten.}{prisma2.png}{.4}{prisma2}
+
+Da aber auch $G-u-v$ keinen Theta-Graph enthalten darf, muss $C$ Länge 3 haben.
+Siehe Abbildung \ref{fig:prisma3}a.
+
+Der resultierende Graph mit $|C| = 3$ ist aber der sogenannte Prisma-Graph.
+Dieser ist planar. Widerspruch.
+
+\imageFigureMultS{$C$ kann nicht Länge $> 3$ haben.}{prisma3.png}
+{\textit{Prisma}-Graph}{prisma3.png}{}{prisma3}{.35}
+
+$\implies$ $G'$ ist ein einfacher Kreis.
+
+Nun können wir uns in Richtung des \textbf{Satzes von Wagner} bewegen.
+Aus Lemma 3 folgern wir, dass $G$ aus einem Kreis $C$, zwei Knoten $x$ und $y$,
+der Kante $\{x,y\}$ und Kanten zwischen $C$ und $x$ und $y$ besteht.
+
+Vorher beweisen noch schnell ein kleines Lemma:
+
+\textbf{Lemma 4}. Für zwei benachbarte Knoten $u$ und $v$ auf $C$ gilt:
+Wenn $u$ zu exakt einem von $\{x, y\}$ verbunden, ist, dann ist $v$ nicht zu
+diesem Knoten aus $\{x, y\}$ verbunden.
+Formaler:
+$$[~\{u,x\} \in E \land \{u,y\} \notin E~] \implies \{v,x\} \notin E$$
+
+Sei o.B.d.A. und nur zur Veranschaulichung angenommen, dass $G$ aussieht wie in
+Abbildung \ref{fig:lem4}.
+Würde es die Kante $\{v, x\}$ geben, dann könnte sie entfernt werden, um einen
+planaren Graphen aus $G$ zu erzeugen, da $G$ minorminimal nicht planar ist.
+
+Wir können diese Kante aber danach wieder planar einfügen:
+Knoten $u$ ist nur durch zwei Kanten an $C$ angeschlossen und durch eine Kante
+an $x$.
+Das bedeutet, dass unabhängig von der Einbettung die Kanten $\{u, v\}$ und
+$\{u, x\}$ direkt aufeinander folgen.
+Die Kante $\{v, x\}$ produziert also keine Kreuzung.
+Damit ist $G$ planar einbettbar. Widerspruch.
+
+$\implies$ Lemma 4 bewiesen.
+
+\imageFigure{Die Kante $\{v, x\}$ darf es hier nicht
+geben.}{lem4.png}{.4}{lem4}
+
+Da $G$ Minimalgrad 3 hat, muss jeder Knoten auf $C$ mit mindestens einem von
+$\{x, y\}$ verbunden sein.
+Nach Lemma 4 sind dann entweder alle Knoten auf $C$ mit $x$ \textit{und} $y$
+verbunden, oder sie sind abwechselnd mit nur einem davon verbunden.
+Ersteres klingt schon sehr nach \Kf~und letzteres klingt nach der Zweifärbung,
+die wir in \Kdd~haben.
+
+In einem letzten Schritt begrenzen wir noch die Größe von $C$.
+Angenommen $C$ hat Größe $\geq 5$.
+Siehe Abbildung \ref{fig:csize}a.
+Entfernt man zwei beliebige auf $C$ benachbarte Kanten $i$ und $j$, dann
+verbleiben die Kanten $x, y, v_1, v_2, v_3$, wobei $v_2$ zwischen $v_1$ und
+$v_3$ auf $C$ liegt.
+
+\imageFigureMultS{$|C| \geq 5$}{csize1.png}
+{$|C| = 4$ und alle Knoten sind mit $x$ und $y$ verbunden.}{csize2.png}
+{Hinweis: Es sind nicht alle Kanten eingezeichnet.}{csize}{.2}
+
+Da $v_2$ zu $v_1$ und $v_3$, aber auch zu einem von $\{x, y\}$ adjazent sein
+muss\footnote{Warum?}, hat $v_2$ Grad 3, womit $G - i - j$ kein einfacher Kreis
+ist. Widerspruch.
+
+$\implies$ $C$ hat Größe 3 oder 4.
+
+Falls $C$ Größe 4 hat und alle Knoten mit $x$ \textit{und} $y$ verbunden sind
+folgt der gleiche Widerspruch.
+Siehe Abbildung \ref{fig:csize}b.
+
+$\implies$ Entweder $C$ hat Größe 3 oder $C$ hat Größe 4 und die Knoten sind
+abwechselnd mit $x$ und $y$ verbunden.
+
+Die abwechselnde Verbundenheit mit $x$ und $y$ ist auf einem Kreis der Größe 3
+offensichtlich nicht möglich, weshalb im Falle $|C|=3$ alle Knoten mit $x$ und
+$y$ verbunden sind.
+
+Diese zwei Möglichkeiten ergeben genau den \Kf~und den \Kdd.
+Siehe Abbildung \ref{fig:proof-k5}.
+
+$\implies$ \Kf~und \Kdd~sind die einzigen minorminimal nicht planaren Graphen.
+
+$\implies$ Alle nicht planaren Graphen beinhalten \Kf~oder \Kdd~als Minor.
+
+\imageFigureMultS{\Kf}{proof-k5.png}{\Kdd}{proof-k33.png}{}{proof-k5}{.3}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
