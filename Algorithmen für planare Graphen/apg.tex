@@ -226,6 +226,7 @@ werden.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\clearpage
 \section{Satz von Kuratowski}
 Wie bereits oben vorgestellt gibt es mindestens zwei Graphen, die nicht planar
 sind:
@@ -666,8 +667,64 @@ $\implies$ Alle nicht planaren Graphen beinhalten \Kf~oder \Kdd~als Minor.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\clearpage
 \section{Färbung}
-\subsection{4-Färbbarkeit}
+Jeder planare Graph ist \textit{4-färbbar}.
+Der Beweis dafür ist allerdings sehr aufwändig und nicht im Rahmen der
+Vorlesung.
+Stattdessen wird die \textit{5-Färbbarkeit} bewiesen.
+
+\subsection{5-Färbbarkeit}
+Der Beweis läuft per Induktion über die Knotenanzahl $n$ des Graphen $G$.
+
+\begin{itemize}
+    \item[\textbf{IA}:] Für $n \leq 4$ ist gilt die Behauptung trivialerweise.
+
+    \item[\textbf{IV}:] Alle planaren Graphen mit $n-1$ Knoten sind 5-färbbar.
+
+    \item[\textbf{IS}:] $n-1 \rightarrow n$\\ Da $G$ planar ist gibt es einen
+        Knoten $v$ mit Grad $\leq 5$.
+
+        \begin{itemize}
+            \item[\textbf{Fall 1}:] $v$ hat Grad $\leq 4$.
+                Dann hat $v$ die Nachbarn $w_1, \dots, w_4$.
+                Da $G-v$ nach IV 5-färbbar ist, existiert eine 5-Färbung von
+                $G-v$.
+                In dieser 5-Färbung werden von $w_1, \dots,w_4$ nur 4 von 5
+                Farben belegt.
+                Die übrige Farbe wird v zugeordnet.
+
+                $\implies$ $G$ ist 5-färbbar.
+            \item[\textbf{Fall 2}:] $v$ hat Grad 5.
+                Dann hat $v$ die Nachbarn $w_1, \dots, w_5$.
+                Die Reihenfolge der Nachbarn ist hier wichtig.
+                Falls die Nachbarn nicht alle Farben ausnutzen, weise die
+                übrige Farbe $v$ zu.
+
+                Ansonsten haben alle Nachbarn verschiedene Farben.
+                Betrachte nun $w_1$ und $w_4$.
+                Wenn sie in $G-v$ nicht verbunden sind, dann liegen sie in den
+                getrennten Zusammenhangskomponenten $H_1$ und $H_4$.
+                Wenn nun in $H_4$ die Farbe 1 und 4 vertauscht wird, dann ist
+                die Färbung in $H_4$ immer noch korrekt, aber $w_4$ hat nun
+                Farbe 1.
+                Danach ist für $v$ die Farbe 4 übrig.
+
+                Sollten $w_1$ und $w_4$ in $G-v$ nicht in getrennten
+                Zusammenhangskomponenten liegen, dann betrachte stattdessen
+                $w_3$ und $w_5$.
+                Wie in Abbildung \ref{fig:color} zu sehen ist, kann in dem
+                planaren Graphen $G-v$ nicht $w_1$ mit $w_4$ \textit{und} $w_3$
+                mit $w_5$ verbunden sein.
+
+                $\implies$ $G$ ist 5-färbbar.
+
+                \imageFigure{Beachte dass wir absichtlich Nachbarpaare wählen,
+                die nicht direkt nebeneinander liegen.}{color.png}{.25}{color}
+        \end{itemize}
+\end{itemize}
+
+
 \subsection{5-Listenfärbbarkeit}
 \subsection{4-Listenfärbbarkeit}
 
@@ -675,43 +732,298 @@ $\implies$ Alle nicht planaren Graphen beinhalten \Kf~oder \Kdd~als Minor.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\clearpage
 \section{Kleinkram}
 \subsection{Außenplanare Graphen}
+\begin{itemize}
+    \item[] $G$ ist \textit{außenplanar}.
+    \item[$\iff$] $G$ lässt sich so planar einbetten, dass alle Knoten auf der
+        äußeren Facette liegen.
+    \item[$\iff$] Man kann einen Knoten zu $G$ hinzufügen und mit allen
+        vorhandenen Knoten verbinden, ohne die Planarität von $G$ zu zerstören.
+    \item[$\iff$] $G$ enthält keine Unterteilung von $K_4$ oder $K_{2,3}$.
+\end{itemize}
+Ein außenplanarer Graph hat außerdem höchstens $2n-3$ Kanten.
+
+Betrachte Abbildung \ref{fig:outplane}.
+Wenn $G$ eine Unterteilung von $K_4$ oder $K_{2,3}$ enthalten würde, würde
+durch das Hinzufügen von $v$ eine Unterteilung von \Kf~bzw. \Kdd~entstehen.
+
+Andersherum kann man auch argumentieren, dass um durch Hinzufügen von $v$ ein
+\Kf~oder \Kdd~zu produzieren, vorher offensichtlich bereits eine Unterteilung
+des $K_4$ bzw. $K_{2,3}$ vorhanden gewesen sein muss.
+
+\imageFigure{}{outplane.png}{.4}{outplane}
+
+Zur Kantenbegrenzung:\\
+$G$ hat $n$ Knoten und $m$ Kanten.
+$G+v$ hat $n'=n+1$ Knoten und $m'=m+n$ Kanten.
+\begin{align*}
+    &G+v \text{ ist planar.}\\
+    \implies &m' \leq 3n'-6\\
+    \implies &m+n \leq 3(n+1)-6\\
+    \implies &m \leq 2n-3
+\end{align*}
+
+
 \subsection{Petersengraph}
+Der Petersengraph besteht aus folgenden Knoten und Kanten:
+Die Knoten sind alle zweielementigen Teilmengen von $\{1,2,3,4,5\}$.
+Die Kanten bestehen zwischen allen Knoten $u$ und $v$, die keine gemeinsamen
+Zahlen besitzen.
+\imageFigure{Petersengraph}{petersen2.png}{.4}{petersen2}
 \subsection{Adjazenztest in $\mathcal{O}(1)$}
+\begin{itemize}
+    \item Start mit ungerichtetem Graphen.
+    \item Es gibt einen Knoten $v$ mit (Ausgangs-)Grad $\leq 5$.
+    \item Orientiere alle nicht-orientierten Kanten von v weg.
+    \item Es gibt einen neuen Knoten mit Ausgangsgrad $\leq 5$.
+    \item Mach mit dem das gleiche.
+    \item Am Ende haben alle Knoten Ausgangsgrad $\leq 5$.
+    \item $Adjazent(v,u) = v\in\mathcal{N}^+(u) \lor u\in\mathcal{N}^+(v)$
+    \item Da $\mathcal{N}^+(x)$ begrenzt, ist $Adjazent \in \mathcal{O}(1)$.
+\end{itemize}
 \subsection{Core-Zerlegung}
 \subsection{Entartetheit}
 \subsection{Dreiecke zählen}
+\begin{itemize}
+    \item Nutze Adjazenztest in $\mathcal{O}(1)$
+    \item Für alle $v$, prüfe ob zwei Nachbarn adjazent sind.
+    \item In $\mathcal{O}(n)$.
+\end{itemize}
+\imageFigure{Algorithmus zum Dreiecke zählen}{dreiecke.png}{.5}{dreiecke}
+
 \subsection{MST}
+Siehe Abbildung \ref{fig:mst}. Erwartet $\mathcal{O}(n)$.
+\imageFigure{Algorithmus zur Konstruktion eines MST}{mst.png}{.8}{mst}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\clearpage
 \section{Planar-Separator-Theorem}
+In jedem planaren Graphen $G$ mit $n \geq 5$ gibt es eine Knotenmenge $S$,
+genannt \textit{Separator}, die bei Herausnahme $G$ in zwei
+Zusammenhangskomponenten $V_1, V_2$ zerlegt, sodass
+
+\begin{itemize}
+    \item $|V_1| \leq \frac{2}{3}n$
+    \item $|V_2| \leq \frac{2}{3}n$
+    \item $|S| \leq 4\sqrt{n}$
+\end{itemize}
+
+Dafür brauchen wir zuerst ein
+
+\textbf{Lemma 4.2} Sei $T$ ein aufspannender Baum in $G$ mit Wurzel $w$ und
+Höhe $h$, dann kann $G$ so in $V_1, V_2, S$ partitioniert werden, dass gilt:
+\begin{itemize}
+    \item $|V_1| \leq \frac{2}{3}n$
+    \item $|V_2| \leq \frac{2}{3}n$
+    \item $|S| \leq 2h+1$
+\end{itemize}
+
+\textbf{Beweis zu Lemma 4.2}:\\
+Sei $G'$ die Triangulierung von $G$.
+Dann hat $G$ nach dem Satz von Euler $3n-6$ Kanten und $2n-4$ Facetten.
+Offensichtlich ist $T$ auch ein aufspannender Baum von $G'$.
+
+Jede Kante in $G'$ ist entweder Teil von $E(T)$, also eine \textit{Baumkante},
+oder eine \textit{Nichtbaumkante}.
+Jede Nichtbaumkante $\{x,y\}$ verläuft zwischen zwei Knoten im Baum $T$ und
+induziert damit einen Kreis, der über den gemeinsamen Vorfahren von $x$ und $y$
+verläuft.
+Dieser Kreis hat maximal Länge $2h+1$ und kann somit als Separator verwendet
+werden und teilt $G$ in $\text{Inneres}(K_{x,y})$ und
+$\text{Äußeres}(K_{x,y})$.
+Wir müssen also nur noch die Größe dieser beiden Partitionen anpassen.
+
+Sei jetzt o.B.d.A das Innere größer.
+Dann müssen wir nur dafür sorgen, dass das Innere $\leq \frac{2}{3}n$ ist.
+Wir behandeln hier naheliegenderweise nur den Fall, dass das Innere $>
+\frac{2}{3}n$ ist.
+
+Im triangulierten Graph $G'$ begrenzt die Kante $\{x, y\}$ zwei Dreiecke, von
+denen eines im Inneren liegt.
+Die dritte am inneren Dreiecke beteiligte Knoten sei nun $t$ genannt.
+Die Kanten $\{x,t\}$ und $\{y,t\}$ können entweder Baumkanten oder
+Nichtbaumkanten sein.
+
+Falls eine der beiden eine Baumkante ist, o.B.d.A. $\{y, t\}$, dann ersetze
+$\{x, y\}$ durch $\{x, t\}$.
+Dadurch gilt:
+
+Falls $t$ auf dem Kreis liegt:
+Das Äußere bleibt gleich groß, das Innere eins kleiner.
+Siehe Abbildung \ref{fig:pst-tree}.
+
+Falls $t$ nicht auf dem Kreis liegt:
+Das Äußere wird um eins größer und das Innere bleibt gleich.
+
+In diesem Fall wird also das Verhältnis zwischen Innerem und Äußerem höchstens
+in die richtige Richtung geschoben und nicht überkorrigiert.
+
+\imageFigure{}{pst-tree.png}{.8}{pst-tree}
+
+Sollten aber beide Kanten Nichtbaumkanten sein, dann können wir statt $K_{x,y}$
+den Kreis $K_{x,t}$ oder $K_{y,t}$ verwenden.
+Siehe Abbildung \ref{fig:pst-tree2}.
+Dazu müssen wir die Größe von $\text{Inneres}(K_{x,t})$ und
+$\text{Inneres}(K_{y,t})$ vergleichen.
+Sei hier o.B.d.A $\text{Inneres}(K_{x,t}) \geq \text{Inneres}(K_{y,t})$.
+
+\imageFigure{}{pst-tree2.png}{.4}{pst-tree2}
+
+Wenn wir nun $\{x,y\}$ durch $\{x,t\}$ ersetzen, gilt
+\begin{align*}
+    \text{Inneres}(K_{x,t}) &\leq \text{Inneres}(K_{x,y}) - 1\\
+    \text{Äußeres}(K_{x,t}) &\leq n - \frac{1}{2}\text{Äußeres}(K_{x,y}) \leq
+    \frac{2}{3}n
+\end{align*}
+
+Inneres wird also auf jeden Fall kleiner und Äußeres wird nicht zu groß.
+
+Das wiederholen wir solange, bis Inneres klein genug ist.
+
+$\implies$ Es kann ein gültiger Separator der Größe $\leq 2h-1$ gefunden
+werden.
+
+Für den Beweis des Satzes verwenden wir noch folgendes
+
+\textbf{Lemma 4.3}. Sei $T$ ein BFS-Baum zum Graphen $G$.
+Jede Nichtbaumkante $\{u, v\}$ in $G$ verbindet zwei Knoten in $T$, die
+entweder auf dem selben oder in anliegenden Leveln sind:
+$$ |level(u) - level(v)| \leq 1 $$
+
+Beweis im Skript.
+Hier ausgelassen.
+
+Sei $T$ der BFS-Baum von $G$ und $G'$ eine Triangulierung von $G$.
+Die Level von $T$ seien mit $0,1,\dots,h$ nummeriert und $S_i$ bezeichnet die
+Knotenmenge in Level $i$.
+
+Dann gehe die Level soweit runter, bis du mehr als die Hälfte der Knoten hinter
+dir hast.
+Das aktuelle Level nenne dann $\mu$.
+
+Falls $|S_\mu| \leq 4\sqrt{n}$, dann sind wir fertig und $S_\mu$ ist unser
+Separator.
+
+Ansonsten wähle mit $m$ das nächste obere Level und mit $M$ das nächste untere
+Level mit Größe $\leq \sqrt{n}$.
+Siehe Abbildung \ref{fig:pst-levels}.
+
+\imageFigure{}{pst-levels.png}{.8}{pst-levels}
+
+Dann setze $A_1$ gleich alle Level über $m$, $A_2$ gleich alle Level unter $M$
+und $A_2$ gleich die dazwischen, exkl. $m$ und $M$.
+
+Falls $|A_2| \leq \frac{2}{3}n$, dann wähle $S = S_m \cup S_M$, $V_1$ als
+Maximum von $A_1, A_2, A_3$ und $V_2$ als die restlichen $A_i$.
+Da $V_1$ als Maximum der $A_i$ gewählt ist, ist $V_2$ höchstens doppelt so groß
+wie $V_1$ und demnach $\leq \frac{2}{3}n$.
+
+Sei stattdessen $|A_2| > \frac{2}{3}n$.
+Dann ist innerhalb von $A_2$ die Höhe maximal $\sqrt{n}$ und es gibt nach Lemma
+4.2 eine Zerteilung von $A_2$ in $S', V'_1, V'_2$ mit $|S'| \leq 2\sqrt{n}+1$
+und $|V'_i| \leq \frac{2}{3}|A_2|$.
+
+Setze dann $S = S' \cup S_m \cup S_M$, dadurch $|S| \leq 4\sqrt{n}+1$.
+Wähle danach $V_1$ als das Maximum von $V'_1, V'_2$ und wähle $V_2$ als $A_1
+\cup A_3 \cup min(V'_1, V'_2)$.
+Siehe Abbildung \ref{fig:pst-final}.
+
+
+\imageFigure{}{pst-final.png}{.95}{pst-final}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\clearpage
 \section{Planaritätstest mit PQ-Baum}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\clearpage
 \section{Triangulierung}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\clearpage
 \section{Matchings}
-\subsection{Erhöhende Wege}
+Ein \textit{Matching} eines Graphen $G$ ist eine Teilmenge $M$ der Kanten, in
+der keine zwei Kanten zum gleichen Knoten inzident sind.
+Jeder Knoten, der an einer Kante aus $M$ liegt, heißt \textit{gematcht}.
+Andernfalls heißt er \textit{ungematcht}.
+
+Bei dem \textbf{Matching-Problem} will man ein Matching maximalen Gewichts
+finden.
+Ist das Kantengewicht überall ein, ist gleichzeitig ein Matching maximaler
+Kardinalität gesucht.
+
+Ein bezüglich $M$ \textit{alternierender} Weg ist ein Weg oder Kreis, dessen
+Kanten abwechselnd in und außerhalb von $M$ liegen.
+In einigen Fällen kann man alle Kanten eines alternierendes Weges flippen und
+somit ein neues Matching erhalten.
+Falls dieses neue Matching schwerer ist, dann heißt der alternierende Weg auch
+\textit{erhöhender Weg}.
+
+Um flippen zu können muss der Weg entweder ein Kreis gerader Länge sein oder
+die erste und letzte Kante jeweils in $M$ oder inzident zu einem ungematchten
+Knoten sein.
+
+\textbf{Lemma 5.1}. Ein Matching $M$ von $G$ hat genau dann maximales Gewicht,
+wenn es bzgl. $M$ keinen erhöhenden Weg gibt.
+
+Die Rückrichtung ist offensichtlich.
+Wir beweisen die Hinrichtung:
+Sei $M$ ein nicht-maximales Matching, für das es keinen erhöhenden Weg gibt.
+Dann gibt es ein schwereres, maximales Matching $M^*$.
+Betrachte die Differenz der beiden Matchings $M\Delta M^*$.
+Dies ist die Menge aller Kanten, die in genau einem von $\{M, M^*\}$ vorkommen.
+
+Da an Kreuzungen maximal zwei Kanten in $M\Delta M^*$ liegen können, hat jeder
+Knoten in $M\Delta M^*$ Grad 1 oder 2.
+Die Differenz besteht also aus einfachen Wegen und Kreisen.
+
+TODO %TODO
+
+\subsection{Algorithmus}
+\begin{itemize}
+    \item Falls $n \leq 3$, nimm einfach die größte Kante und fertig.
+    \item Sonst zerlege $G$ in $V_1, V_2, S$.
+        Führe Algorithmus auf $V_1$ und $V_2$ aus um Matchings $M_1, M_2$ zu
+        bekommen.
+        Setze dann $M = M_1 \cup M_2$.
+        Sei $V' = V_1 \cup V_2$ die Knotenmenge ohne Separator.
+    \item Solange der Separator nicht leer ist, verschiebe einen Knoten von $S$
+        nach $V'$ und finde ein neues maximales Matching nach Lemma 5.2
+\end{itemize}
+
+Laufzeit in $\mathcal{O}(n^\frac{3}{2})$ falls der Lemma-5.2-Schritt in
+$\mathcal{O}(n)$.\\
+Laufzeit in $\mathcal{O}(n^\frac{3}{2} * \log n)$ falls der Lemma-5.2-Schritt
+in $\mathcal{O}(n * \log n)$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\clearpage
 \section{Mixed-Max-Cut und Via-Minimierung}
+Das \textbf{Min-Cut-Problem} liegt für allgemeine Graphen in $\mathcal{P}$.
+Das \textbf{Max-Cut-Problem} ist für allgemeine Graphen $\mathcal{NP}$-schwer.
+
+Das allgemeinere \textbf{Mixed-Max-Cut-Problem} ist für allgemeine Graphen
+natürlich auch $\mathcal{NP}$-schwer.
+Auf planaren Graphen ist jedoch \textbf{Mixed-Max-Cut-Problem} in
+$\mathcal{O}(n^\frac{3}{2} * \log n)$ lösbar.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\clearpage
 \section{\textit{st}-planare Graphen}
 \subsection{Max-Flow}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\clearpage
 \section{Menger}
 
 
