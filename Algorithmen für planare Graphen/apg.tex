@@ -726,7 +726,9 @@ Der Beweis läuft per Induktion über die Knotenanzahl $n$ des Graphen $G$.
 
 
 \subsection{5-Listenfärbbarkeit}
+TODO % TODO
 \subsection{4-Listenfärbbarkeit}
+TODO % TODO
 
 % Verbindung Maximalgrad <-> Chromatische Zahl
 
@@ -939,11 +941,13 @@ Siehe Abbildung \ref{fig:pst-final}.
 
 \clearpage
 \section{Planaritätstest mit PQ-Baum}
+TODO % TODO
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \clearpage
 \section{Triangulierung}
+TODO % TODO
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1012,19 +1016,377 @@ Das \textbf{Max-Cut-Problem} ist für allgemeine Graphen $\mathcal{NP}$-schwer.
 
 Das allgemeinere \textbf{Mixed-Max-Cut-Problem} ist für allgemeine Graphen
 natürlich auch $\mathcal{NP}$-schwer.
-Auf planaren Graphen ist jedoch \textbf{Mixed-Max-Cut-Problem} in
+Auf planaren Graphen ist jedoch Mixed-Max-Cut-Problem in
 $\mathcal{O}(n^\frac{3}{2} * \log n)$ lösbar.
+
+Auf planaren Graphen ist das Mixed-Max-Cut-Problem äquivalent zum
+Mixed-Max-Kreis-Problem auf dem Dualgraphen:
+
+\textbf{Mixed-Max-Kreis-Problem}\\
+Finde auf einem Graphen $G$ eine maximal schwere \textit{gerade} Kantenmenge.
+
+\textit{Gerade} bedeutet hierbei, dass alle Knoten geraden Grad haben.
+
+Ein Matching, dass genau $\frac{n}{2}$ Knoten matcht, heißt \textit{perfektes
+Matching}.
+
+\subsection{Algorithmus von Shih, Wo und Kuo}
+\begin{enumerate}
+    \item Trianguliere $G$ zu $G_T$ und gebe den neuen Kanten Gewicht 0.
+    \item Berechne den Dualgraphen $G^*$ zu $G_T$.
+        Dabei hat jede Kante das Gewicht ihrer Dualkante.
+        Da $G_T$ trianguliert ist, hat in $G^*$ jeder Knoten Grad 3.
+    \item Kontruiere $G'$ aus $G$ mit nachfolgenden Algorithmus.
+        Ein perfektes minimales Matching in $G'$ induziert eine gerade Menge
+        maximalen Gewichts in $G^*$.
+    \item Konstruiere eben dieses perfekte minimale Matching in $G'$ mit
+        weiterem nachfolgenden Algorithmus.
+    \item Falls bei Rückführung von $M$ auf $G^*$ eine nichtleere Teilmenge von
+        $E^*$ entsteht, dann gebe den dualen Schnitt dieser Teilmenge in $G$
+        aus.
+        Ansonsten verwende weiteren nachfolgenden Algorithmus zum konstruieren
+        einer alternativen maximalen geraden Menge in $G^*$.
+\end{enumerate}
+
+\textbf{Algorithmus zu Schritt 3}:\\
+Alle Knoten in $G^*$ haben Grad 3.
+Ersetze alle Knoten nach dem Schema in Abbildung \ref{fig:shih1}.
+Alle neuen Kanten erhalten dabei Gewicht 0.
+
+\imageFigure{}{shih1.png}{.6}{shih1}
+
+Alle Knoten in $G^*$ haben Grad 3, also gibt es eine gerade Anzahl Knoten.
+Dies gilt auch nach allen Ersetzungen für $G'$.
+Es existiert also ein perfektes Matching auf beiden Graphen.
+
+\textbf{Lemma 6.3}. Falls M ein perfektes Matching auf $G'$ ist, dann
+induzieren die restlichen Kanten $E'\backslash M$ eine gerade Menge $M^*$ in
+$G^*$.
+Andersrum induziert eine gerade Menge $E^*_o$ in $G^*$ ein perfektes Matching
+in $G'$.
+
+\textbf{Beweis zu Lemma 6.3}\\
+\enquote{$\implies$}:\\
+Wie in Abbildung \ref{fig:shih2} zu sehen ist, gibt es pro Knoten zwei mögliche
+Matchings.
+Beide induzieren in $G^*$ eine Kantenmenge, mit der $v$ geraden Grad hat.
+Im linken Fall hat $v$ Grad 0, im rechten Grad 2.
+
+\imageFigure{}{shih2.png}{.7}{shih2}
+
+\enquote{$\Longleftarrow$}:\\
+In $E^*_o$ ist der Grad von $v$ entweder 0 oder 2.
+Bei Grad 0 ist die linke Konfiguration aus Abbildung \ref{fig:shih2} möglich,
+bei Grad 2 die rechte Konfiguration.
+Die rechte Konfiguration ist auch mit einer anderen Belegung von $\{e_1, e_2,
+e_3\}$ möglich, solange genau eine davon rot ist.
+
+Es bleibt noch zu zeigen, dass die Minimalität des Matchings in $G'$ äquivalent
+zur Maximalität der geraden Menge in $G^*$ ist.
+
+Da alle künstlichen Kanten in $M$ Gewicht 0 haben gilt:
+
+$$ w(E'\backslash M) = w(E^*) - w(E^* \cap M) = w(E^*) - w(M) $$
+$$ \implies w(E^*) = w(E'\backslash M) - w(M) $$
+
+Die durch das Matching $M$ induzierte Menge $M^*$ ist möglicherweise leer.
+Das wird später behandelt.
+
+\textbf{Algorithmus zu Schritt 4}:\\
+Wir wollen ein minimales perfektes Matching finden und kennen von vorher
+bereits ein Algorithmus zum finden maximaler Matchings auf planaren Graphen.
+
+Die Optimierungsrichtung können wir einfach umdrehen, indem wir die
+Kostenfunktion verändern:
+$$ w'(e) = W - w(e) $$
+
+$W$ ist hierbei eine ausreichend große Konstante.
+
+Die Perfektheit der Matchings können wir auch nocht erzwingen.
+Bei perfekten Matchings gilt:
+$$ w'(M) = \sum_{e \in M}{w'(e)} = \sum_{e \in M}{W - w(e)} =
+\frac{n}{2}W - \sum_{e \in M}{w(e)} \geq \frac{n}{2}W - \frac{n}{2}w_{max}$$
+
+$w_{max}$ ist hierbei das maximale originale Kantengewicht.
+Für ein kleineres, nicht perfektes Matching $M^-$ gilt das Gegenteil:
+$$ w'(M^-) \leq (\frac{n}{2} - 1) * (W - w_{min}) $$
+
+Wir können also erzwingen, dass alle perfekten Matchings größer sind als alle
+nicht perfekten Matchings, indem wir $W$ folgendermaßen wählen:
+$$ W > \frac{n}{2} * (w_{max} - w_{min}) + w_{min} $$
+
+Danach gibt uns der Algorithmus zwangsweise ein perfektes minimales Matching.
+
+\textbf{Algorithmus zu Schritt 5}:\\
+Es kann passieren, dass $M$ eine leere Menge in $M*$ induziert.
+Das passiert dann, wenn ein paar aus zwei Kanten aus $\{e_1, e_2, e_3\}$ für
+jeden Knoten ein negatives Gewicht hat und der Algorithmus demnach für jeden
+Knoten die linke Variante aus Abbildung \ref{fig:shih2} auswählt.
+
+Das können wir lösen, indem wir die Konstruktion aus Abbildung \ref{fig:shih1}
+nochmal erweitern.
+Siehe dazu Abbildung \ref{fig:shih3}.
+
+\imageFigure{}{shih3.png}{.7}{shih3}
+
+Diese Erweiterung wird für \textit{genau einen} Knoten $v$ verwendet.
+Die zwei neuen Kanten erhalten wieder Gewicht 0.
+
+Mit der neuen Konstruktion ist für $v$ nur noch die rechte Variante möglich, da
+im neuen Matching die Kanten $M_v$ $\{w', u'\}$ und $\{w'', u''\}$ enthalten
+sein müssen.
+Dadurch ist zwangsweise genau eine der $e$-Kanten enthalten und es werden die
+zwei anderen in $G^*$ induziert.
+Damit ist die durch $M_v$ in $G^*$ induzierte Kantenmenge gerade.
+Auch hier gilt:
+$$ M_v \text{ perfekt und minimal} \iff M_v^* \text{ gerade und maximal} $$
+
+Wir können mit dem Algorithmus von vorher das Matching in $\mathcal{O}(n*\log
+n)$ $M$ zu $M_v$ erweitern, indem wir für $v$ erst $w'$ und dann $w''$
+hinzufügen.
+
+Wenn wir das ganze jetzt für jedes $v$ in $V^*$ ausprobieren und das kleinste
+der minimale Matchings $M_v$ aussuchen, finden somit in $\mathcal{O}(n^2*\log
+n)$ eine nicht-leere maximale gerade Menge in $V^*$.
+
+
+TODO: Schnellere Version mit PST % TODO
+
+TODO: Via-Minimierung % TODO
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \clearpage
 \section{\textit{st}-planare Graphen}
+
+TODO % TODO
+
 \subsection{Max-Flow}
+
+TODO % TODO
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \clearpage
 \section{Menger}
+\textbf{Menger-Problem}\\
+Sei $G$ ein Graph und $s, t$ Knoten in $G$.
+Finde eine maximale Anzahl an kanten- bzw. intern knotendisjunkten
+$s$-$t$-Wegen.
 
+\subsection{Kantendisjunkte Version}
+Folgender Algorithmus läuft in Linearzeit auf einem planaren Graphen $G$.
+Sei $G$ so planar eingebettet, dass $t$ an der äußeren Facette liegt.
+
+\begin{enumerate}
+    \item Ersetze in $G$ alle ungerichteten Kante $\{u, v\}$ durch die
+        beiden gerichteten Kanten $(u,v)$ und $(v, u)$.
+        G ist nun ein gerichteter Graph.
+    \item Berechne eine Menge \textit{geeigneter} einfacher kantendisjunkter
+        Kreise und betrachte den Graphen $G_C$, der entsteht, wenn man alle
+        Kreiskanten umdreht.
+    \item Berechne $s$-$t$-Wege auf $G_C$.
+    \item Konstruiere aus den $s$-$t$-Wegen in $G_C$ eine gleiche Anzahl
+        $s$-$t$-Wege in $G$.
+        Dabei wird von den in Schritt 1 hinzugefügten Kanten jeweils nur eine
+        benutzt, sodass die Wegemenge auch für den originalen ungerichteten
+        Graphen gültig ist.
+\end{enumerate}
+
+\textbf{Ausführung von Schritt 1}:\\
+\textbf{Lemma 7.2.} Man kann jede Wegemenge $P_d$ aus kantendisjunkten
+$s$-$t$-Wegen so zu einer Menge $P$ umbauen, dass kein in Schritt 1 eingefügtes
+Kantenpaar doppelt benutzt wird.
+
+\textbf{Beweis.}\\
+Wenn das Kantenpaar von einem einzigen Weg $p$ doppelt benutzt wird, dann
+stellt das einen unnötigen Umweg da und $p$ kann durch einen einfachen Weg
+ersetzt werden, der das Kantenpaar gar nicht benutzt.
+
+Wenn stattdessen das Kantenpaar von zwei unterschiedlichen Wegen $p_i$ und
+$p_j$ benutzt wird, dann können wir die Wege aufteilen in einen Teil vor dem
+Kantenpaar und einen Teil danach.
+Fügen wir nun beide Nachfolgeteile jeweils an den Vorgängerteil exkl. der Kante
+aus dem Kantenpaar des anderen Weges an, erhalten wir zwei $s$-$t$-Wegen, die
+das Kantenpaar nicht benutzen.
+
+\textbf{Ausführung von Schritt 2}:\\
+Wir konstruieren eine Menge einfacher kantendisjunkter Kreise $C$ auf $G$, die
+auf $G_C$ folgende Eigenschaften induziert:
+
+\begin{enumerate}
+    \item $G_C$ enthält keinen Rechtskreis.
+        Das Innere jedes Kreises liegt also links von den Kanten.
+    \item Wir können eine Menge $P_C$ kantendisjunkter $s$-$t$-Wege auf $G_C$
+        bilden und daraus eine Menge $P$ auf $G$ konstruieren, für die gilt:
+
+        $$ P \text{ maximal} \iff P_C \text{ maximal} $$
+
+        $P$ sind dabei alle Kanten aus $P_C$ mit folgenden Änderungen:
+        \begin{itemize}
+            \item Alle Kanten auf $P_C$ die vorher umgedreht wurden, also nicht
+                so in $G$ vorkommen, werden nicht übernommen.
+            \item Alle Kanten die vorher umgedreht wurden und \textit{nicht}
+                auf $P_C$, werden in ihrer originalen Ausrichtung
+                hinzugenommen.
+                Das sind genau die Kanten, die auf $C$, aber nicht auf $P_C$
+                liegen.
+        \end{itemize}
+\end{enumerate}
+
+\imageFigure{}{menger1.png}{.75}{menger1}
+
+Sei $dist(f)$ der Abstand einer Facette zur äußeren Facette $f_0$, also der
+Abstand zwischen dem Dualknoten von $f$ und $f_0$.
+Sei $l$ der maximale Abstand einer Facette zur äußeren.
+
+Wir nehmen uns nun alle Kreise $C$ in $G$, die den Übergang zwischen zwei
+Abständen markieren, also alle Kreise $c_i$, dessen innere Facetten Distanz
+$\geq i$ und dessen äußere Facetten Distanz $< i$ haben.
+Siehe Abbildung \ref{fig:menger2}.
+
+\imageFigure{}{menger2.png}{.75}{menger2}
+
+Bei jedem dieser Kreise in $C$ haben wir auf $G$ zwei Varianten: Den Linkskreis
+und den Rechtskreis.
+Wir nehmen alle Rechtskreise, drehen sie um und erhalten so $G_C$.
+
+Jede Kreis in $G$ umschließt mindestens eine Facette.
+Demnach muss auch jeder Kreis zu Teilen in $C$ vorkommen.
+Da diese Teile umgedreht wurden, gibt es auch $G_C$ keine Rechtskreise mehr.
+Eigenschaft 1 ist also erfüllt.
+
+Für Eigenschaft 2 benutzt wir folgendes
+
+\textbf{Lemma 7.4.} Sei $H$ ein gerichteter zusammenhängender Graph und $s, t$
+zwei Knoten auf $H$.
+$H$ besteht aus $k$ kantendisjunkten $s$-$t$-Wegen genau dann, wenn folgendes
+gilt:
+\begin{itemize}
+    \item Außer für $s$ und $t$ ist Ausgangsgrad gleich Eingangsgrad.
+        Es produziert also kein Knoten ein \enquote{Bottleneck}.
+    \item $k = d^{out}(s) - d^{in}(s) = d^{in}(t) - d^{out}(t)$.
+        $k$ ist also genau so groß wie die Anzahl Kanten, die von $s$
+        \enquote{produziert} und von $t$ \enquote{konsumiert} werden.
+\end{itemize}
+
+Beweis im Skript. Hier weggelassen.
+
+Wenn wir von $P_C$ nach $P$ wechseln ändern sich für die beteiligten Knoten
+der Ausgangsgrad und der Eingangsgrad um den gleichen Betrag.
+
+TODO: Randfälle, für die sich die Grade anders ändern. % TODO
+
+$\implies$ Aus $k$ kantendisjunkten $s$-$t$-Wegen auf $G_C$ lassen sich $k$
+kantendisjunkte $s$-$t$-Wege auf $G$ konstruieren.
+
+\textbf{Ausführung von Schritt 3}:\\
+Algorithmus: Siehe Abbildung \ref{fig:menger3}.
+\imageFigure{}{menger3.png}{1}{menger3}
+
+TODO: Schritt 4 % TODO
+
+\subsection{Knotendisjunkte Version}
+\begin{enumerate}
+    \item Ersetze in $G$ alle ungerichteten Kante $\{u, v\}$ durch die
+        beiden gerichteten Kanten $(u,v)$ und $(v, u)$, außer sie sind inzident
+        zu $s$ oder $t$.
+        Für $s$ nur die ausgehenden Kanten.
+        Für $t$ nur die eingehenden Kanten.
+        G ist nun ein gerichteter Graph.
+        Eine Menge knotendisjunkter $s$-$t$-Wege auf $G$ induzieren direkt eine
+        gleich große Menge knotendisjunkter $s$-$t$-Wege auf dem originalen
+        Graphen.
+    \item Finde $s$-$t$-Wege auf $G$ mittels Right-First-Tiefensuche.
+        Wende bei Konflikten in besuchten Knoten nachfolgende Behandlung an.
+\end{enumerate}
+
+Bei \textbf{Konflikt von links}:\\
+Lösche aktuell benutzte Kante und gehe einen Schritt zurück.
+
+Bei \textbf{Konflikt von rechts}:\\
+Teile den schon vorhandenen Pfad $p$ in den Teil $p_-$ vor $v$ und den Teil
+$p_+$ danach.
+Vertausche $p_-$ und den aktuellen Suchpfad, sodass der aktuelle Suchpfad mit
+$p_+$ einen Weg ergibt.
+$p_-$ ist nun der aktuelle Suchpfad und hat demnach gerade eine Kollision von
+links ausgelöst, die wie oben beschrieben behandelt wird.
+
+Die Konfliktbehandlung von rechts funktioniert nicht, wenn $p_+$ Teil des
+aktuellen Suchpfads ist, also noch nicht Teil eines abgeschlossenen Weges.
+Das passiert nur dann, wenn wir durch einen Rechtskreis an einen früheren
+Knoten im gleichen Suchpfad gelangen.
+Da wir Right-First-Auswahl verwenden, passiert das aber nur, wenn wir vorher
+den umgekehrten Linkskreis gelaufen sind.
+Wir können dieses Problem unterbinden, indem wir Knoten als \textit{Teil des
+aktuellen Suchpfads} markieren und bei dem Konflikt dann stattdessen die
+Behandlung für Links-Konflikte verwenden.
+
+Für die Zugehörigkeit zum aktuelle Suchpfad geben wir jedem Knoten einen
+Timestamp, sobald er zum Kopf des Suchpfades wird.
+Der globale Timestamp-Counter wird erhöht, wenn wir einen neuen Weg von $s$ aus
+starten oder Wege bei der Konfliktbehandlung von rechts umsortieren.
+Ein vorheriger Knoten ist dann genau dann noch Teil des aktuellen Suchswegs,
+wenn der Timestamp des vorherigen Knoten dem Timestamp des Suchkopfes gleicht.
+
+\imageFigure{}{menger4.png}{1}{menger4}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\clearpage
+\section{Okamura-Seymour}
+\textbf{Kantendisjunktes Wegpackungsproblem}\\
+Sei $G$ ein Graph und $\{s_1, t_1\}, \dots, \{s_k, t_k\}$ Paare von $s$- und
+$t$-Knoten.
+Finde paarweise kantendisjunkte $s_i$-$t_i$-Wege $p_i$.
+
+Das Problem ist auch auf planaren Graphen $\mathcal{NP}$-vollständig.
+
+Die \textit{Kapazität} $cap(X)$ eines Knoten-Teilmenge $X$ ist die Anzahl Kanten, die
+über ihre Grenze verläuft.
+Das ist auch die Größe des von ihr induzierten Schnittes.
+
+Die \textit{Dichte} $dens(X)$ einer Knoten-Teilmenge $X$ ist die Anzahl
+$s$-$t$-Paare, von denen genau ein Teil in $X$ liegt.
+
+Offensichtlich müssen zur Erfüllung des Wegpackungsproblems alle möglichen
+Knoten-Teilmengen von $G$ eine Kapazität $\geq$ ihrer Dichte haben.
+
+Dazu sei $fcap(X)$ die freie Kapazität von $X$ mit
+$$ fcap(X) = cap(X) - dens(X) $$
+
+Falls $fcap(X) = 0$, dann ist $X$ \textit{saturiert}.\\
+Falls $fcap(X) < 0$, dann ist $X$ \textit{übersaturiert}.
+
+Die \textit{Kapazitätsbedingung} fordert, dass $fcap(X) \geq 0$ für
+alle Teilmengen $X$ gilt.
+Sie ist eine notwendige Bedingung für die Lösbarkeit des Wegpackungsproblems.
+
+Die \textit{Geradheitsbedingung / Euler-Bedingung} fordert, dass $fcap(X)$
+gerade ist für alle Teilmengen $X$.
+
+\textbf{Okamura \& Seymour-Problem}\\
+Gegeben sei ein planarer Graph $G$ und eine Menge $D$ von $k$ $s$-$t$-Paare,
+die alle auf dem Rand derselben Facette liegen.
+O.B.d.A sei eine Einbettung von $G$ gegeben, bei der diese Facette die äußere
+Facette ist.
+Außerdem sei die Geradheitsbedingung erfüllt.
+Finde paarweise knotendisjunkte $s_i$-$t_i$-Wege $p_i$.
+
+\textbf{Lemma 8.2.}
+Die Geradheitsbedingung ist genau dann erfüllt, wenn $fcap(\{v\})$ gerade für
+alle Knoten $v$.
+
+Beweis im Skript. Hier ausgelassen.
+
+\textbf{Satz von Okamura \& Seymour}\\
+Ist zusätzlich noch die Kapazitätsbedingung erfüllt, dann ist das Okamura \&
+Seymour-Problem lösbar.
+
+\subsection{Algorithmus}
+
+TODO % TODO
 
 \end{document}
